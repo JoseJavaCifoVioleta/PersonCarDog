@@ -164,73 +164,104 @@ public class Service {
         }
         return removed;
     }
-}
 
 
-/*
-package org.example.service;
+    // =========================================================================
+    // CAPÍTULO 2: OPERACIONES CRUD PARA COCHES (CAR)
+    // =========================================================================
 
-import org.example.repository.Repository;
-import org.example.model.Car;
-import org.example.model.CarTransaction;
-import org.example.model.Person;
+    // CREAR: Fabricamos un objeto 'Car' (Model) y lo guardamos en el almacén (Repository).
+    // Helsinki Cap. 5: Uso de constructores para inicializar objetos con datos obligatorios.
+    public static Car createCar(String make, String model, int year, Repository repo) {
+        System.out.println("Starting process to create a new Car...");
 
-import java.util.Date;
-
-public class Service {
-
-
-    public static boolean buyCar(Person buyer, Person seller, int price, Repository repo){
-
-        System.out.println("Welcome to BUY MENU");
-        // person buyer a exists at array
-        if (!repo.getAllPeople().contains(buyer)) {
-            System.out.println("Buyer not found in repository.");
-            return false;
-        }
-        System.out.println("Buyer exits: " + buyer);
-
-        // person seller b exists at array
-        if (!repo.getAllPeople().contains(seller)) {
-            System.out.println("Seller not found in repository.");
-            return false;
-        }
-        System.out.println("Seller exits: " + seller);
-
-        // car exists??
-        if (seller.getCar() == null) {
-            System.out.println("Seller does not have a car to sell.");
-            return false;
+        // VALIDACIÓN (Lógica de Service): Impedimos años imposibles o textos vacíos (.isEmpty()).
+        if (make == null || make.trim().isEmpty() || model == null || model.trim().isEmpty() || year < 1886) {
+            System.out.println("Error: Make and model cannot be blank, and year must be valid.");
+            return null; // Si falla la regla de negocio, el Chef (Service) frena la operación.
         }
 
-        // person a has a car
-        Car car = seller.getCar();
-        System.out.println("Seller can sell a car: "  + car);
+        // Model en acción: Usamos la plantilla 'Car' para dar forma al nuevo registro en memoria.
+        Car newCar = new Car(make, model, year);
 
-        // person b does not have a car
-        if (buyer.getCar() != null) {
-            System.out.println("Buyer already has a car.");
+        // Repository en acción: Abrimos la despensa general y guardamos el coche en su lista interna.
+        repo.addCar(newCar);
+        System.out.println("Car created and saved successfully to repository: " + newCar);
+        return newCar;
+    }
+
+    // LEER (UNO): Busca un coche específico en el almacén utilizando su identificador único (ID).
+    // Helsinki Cap. 4: Uso de bucles For-Each para examinar colecciones de datos una por una.
+    public static Car getCarById(String id, Repository repo) {
+        System.out.println("Searching repository for Car ID: " + id);
+
+        // Recorremos la lista que nos da el Repository buscando una coincidencia de ID.
+        for (Car c : repo.getAllCars()) {
+            if (c.getId().equals(id)) {
+                System.out.println("Match found: " + c.getMake() + " " + c.getModel());
+                return c; // Si lo encuentra, devuelve el coche y termina la función.
+            }
+        }
+        System.out.println("Car with ID " + id + " not found in our records.");
+        return null;
+    }
+
+    // LEER (TODOS): Obtiene el listado completo de coches de la base de datos en memoria.
+    // Sirve para consultar el estado actual del almacén (Repository) sin alterar ningún dato.
+    public static ArrayList<Car> getAllCars(Repository repo) {
+        System.out.println("Retrieving complete list of cars from repository...");
+        return repo.getAllCars();
+    }
+
+    // ACTUALIZAR: Modifica los datos internos de un coche que ya existe en el almacén.
+    // Helsinki Cap. 5: Uso de métodos 'setter' para modificar de forma segura variables privadas.
+    public static boolean updateCar(String id, String newMake, String newModel, int newYear, Repository repo) {
+        System.out.println("Starting update process for Car ID: " + id);
+
+        // Reutilizamos nuestro método de lectura para verificar si el coche realmente existe en la 'despensa' (simil).
+        Car target = getCarById(id, repo);
+        if (target == null) {
             return false;
         }
 
-        System.out.println("Buyer can buy a car.");
+        // Volvemos a validar las reglas antes de sobreescribir los datos viejos.
+        if (newMake == null || newMake.trim().isEmpty() || newModel == null || newModel.trim().isEmpty() || newYear < 1886) {
+            System.out.println("Error: New update values for Car are invalid.");
+            return false;
+        }
 
-        // personB.setCar (bmw)
-        buyer.setCar(car);
-        // personA.car = null
-        seller.setCar(null);
-
-        System.out.println("Settings done, now creating CarTransaction ...");
-
-        // create object CarTransaction
-        CarTransaction transaction = new CarTransaction(buyer, seller, new Date(), car, "Car sold for " + price);
-        // save object CarTransaction at repo
-        repo.addCarTransaction(transaction);
-
-        // PRINT
-        System.out.println(transaction);
-
+        // Modificamos el estado del objeto 'Model' persistido en las listas del repositorio.
+        target.setMake(newMake);
+        target.setModel(newModel);
+        target.setYear(newYear);
+        System.out.println("Car fields updated successfully: " + target);
         return true;
     }
+
+    // BORRAR: Elimina un coche por completo de la lista del almacén.
+    // REGLA DE INTEGRIDAD (Vínculo de Modelos): Si eliminamos un coche, debemos revisar si alguna
+    // Persona (Model) lo tiene asignado como su propiedad para ponérselo a 'null' (Ninguno).
+    public static boolean deleteCar(String id, Repository repo) {
+        System.out.println("Starting deletion process for Car ID: " + id);
+
+        Car target = getCarById(id, repo);
+        if (target == null) {
+            return false;
+        }
+
+        // Helsinki Cap. 4 y 5: Recorremos los dueños para limpiar referencias rotas en la memoria.
+        for (Person p : repo.getAllPeople()) {
+            if (p.getCar() != null && p.getCar().equals(target)) {
+                System.out.println("Safety Check: Removing car link from owner: " + p.getName());
+                p.setCar(null); // Desvinculamos el coche de la persona para mantener los datos limpios.
+            }
+        }
+
+        // Eliminamos el coche físicamente de la lista del Repository.
+        boolean removed = repo.getAllCars().remove(target);
+        if (removed) {
+            System.out.println("Car has been completely removed from the system.");
+        }
+        return removed;
+    }
 }
-*/

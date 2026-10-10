@@ -36,10 +36,8 @@ public class Controller {
                     }
                     break;
                 case "3":
-                    System.out.println("\n--- LISTA DE COCHES (3 objetos) ---");
-                    for (Car c : repo.getAllCars()) {
-                        System.out.println(c);
-                    }
+                    // Redirigimos el flujo hacia nuestra nueva gestión completa de coches
+                    manageCarMenu(scan, repo);
                     break;
                 case "4":
                     List<Person> people = repo.getAllPeople();
@@ -117,91 +115,54 @@ public class Controller {
             }
         }
     }
-}
 
-/*
-package org.example.controller;
-
-
-import org.example.model.Car;
-import org.example.model.Person;
-import org.example.model.Dog;
-
-import org.example.repository.Repository;
-import org.example.service.Service;
-import org.example.utils.DataSeeder;
-import org.example.utils.Utils;
-
-import java.util.List;
-import java.util.Scanner;
-
-public class Controller {
-
-    public static void run() {
-
-        System.out.println( "Hello to Transaction Cars Person to Person!" );
-
-        // 1. Instanciamos el repositorio único vacío
-        Repository repo = new Repository();
-
-        // 2. Poblamos el repositorio dinámicamente usando Java Faker (Exactamente 10 objetos en total)
-        DataSeeder.seedRepository(repo);
-
-        Scanner scan = new Scanner(System.in);
-
+    // =========================================================================
+    // SUBMENÚ DE COCHES: Captura de pantalla (Utils) unida a la lógica (Service)
+    // =========================================================================
+    private static void manageCarMenu(Scanner scan, Repository repo) {
         while (true) {
-            Utils.mainMenu();
-
+            Utils.carMenu(); // Pintamos el menú de coches en la pantalla usando las herramientas de Utils
             String option = Utils.askMenuOption(scan);
 
             switch (option) {
-                case "1":
-                    //System.out.println("Person - not implemented yet.");
-                    System.out.println("\n--- LISTA DE PERSONAS (3 objetos) ---");
-                    for (Person p : repo.getAllPeople()) {
-                        System.out.println(p + " | Coche asignado: " + (p.getCar() != null ? p.getCar().getMake() : "Ninguno"));
+                case "1": // Crear Coche
+                    String make = Utils.askString(scan, "Enter make: ");
+                    String model = Utils.askString(scan, "Enter model: ");
+                    int year = Utils.askInt(scan, "Enter year: ");
+                    Service.createCar(make, model, year, repo); // Pasamos los datos recolectados al Chef (Símil)
+                    break;
+
+                case "2": // Listar todos los coches
+                    System.out.println("\n--- CURRENT CARS IN SYSTEM ---");
+                    for (Car c : Service.getAllCars(repo)) {
+                        System.out.println(c); // Imprime el molde del coche usando su método toString()
                     }
                     break;
-                case "2":
-                    //System.out.println("Dog - not implemented yet.");
-                    System.out.println("\n--- LISTA DE PERROS (2 objetos) ---");
-                    for (Dog d : repo.getAllDogs()) {
-                        System.out.println(d);
-                    }
+
+                case "3": // Buscar por ID
+                    String searchId = Utils.askString(scan, "Enter Car ID to find: ");
+                    Service.getCarById(searchId, repo);
                     break;
-                case "3":
-                    //System.out.println("Car - not implemented yet.");
-                    System.out.println("\n--- LISTA DE COCHES (3 objetos) ---");
-                    for (Car c : repo.getAllCars()) {
-                        System.out.println(c);
-                    }
+
+                case "4": // Actualizar Coche
+                    String updateId = Utils.askString(scan, "Enter Car ID to update: ");
+                    String newMake = Utils.askString(scan, "Enter new make: ");
+                    String newModel = Utils.askString(scan, "Enter new model: ");
+                    int newYear = Utils.askInt(scan, "Enter new year: ");
+                    Service.updateCar(updateId, newMake, newModel, newYear, repo);
                     break;
-                case "4":
-                    //Service.buyCar(b, a , 100, repo);
 
-                    // Recuperamos la lista de personas añadidas por el seeder
-                    List<Person> people = repo.getAllPeople();
-
-                    if (people.size() >= 2) {
-                        // Tomamos a los candidatos preparados por el Seeder
-                        Person seller = people.get(0); // Tiene coche
-                        Person buyer = people.get(1);  // No tiene coche
-
-                        // Ejecutamos el servicio de compraventa
-                        int fakePrice = 15000;
-                        Service.buyCar(buyer, seller, fakePrice, repo);
-                    } else {
-                        System.out.println("No hay suficientes personas en el repositorio.");
-                    }
-
+                case "5": // Eliminar Coche
+                    String deleteId = Utils.askString(scan, "Enter Car ID to delete: ");
+                    Service.deleteCar(deleteId, repo);
                     break;
-                case "5":
-                    System.out.println("Goodbye!");
+
+                case "6": // Volver al Menú Principal
                     return;
+
                 default:
                     System.out.println("Invalid option, try again.");
             }
         }
     }
 }
-*/
