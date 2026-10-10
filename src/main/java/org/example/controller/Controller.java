@@ -30,10 +30,8 @@ public class Controller {
                     managePersonMenu(scan, repo);
                     break;
                 case "2":
-                    System.out.println("\n--- LISTA DE PERROS (2 objetos) ---");
-                    for (Dog d : repo.getAllDogs()) {
-                        System.out.println(d);
-                    }
+                    // Redirigimos el flujo hacia nuestra nueva gestión completa de perros
+                    manageDogMenu(scan, repo);
                     break;
                 case "3":
                     // Redirigimos el flujo hacia nuestra nueva gestión completa de coches
@@ -155,6 +153,56 @@ public class Controller {
                 case "5": // Eliminar Coche
                     String deleteId = Utils.askString(scan, "Enter Car ID to delete: ");
                     Service.deleteCar(deleteId, repo);
+                    break;
+
+                case "6": // Volver al Menú Principal
+                    return;
+
+                default:
+                    System.out.println("Invalid option, try again.");
+            }
+        }
+    }
+
+    // =========================================================================
+    // SUBMENÚ DE PERROS: Captura de pantalla (Utils) unida a la lógica (Service)
+    // =========================================================================
+    private static void manageDogMenu(Scanner scan, Repository repo) {
+        while (true) {
+            Utils.dogMenu(); // Pintamos el menú de perros en la pantalla usando las herramientas de Utils
+            String option = Utils.askMenuOption(scan);
+
+            switch (option) {
+                case "1": // Crear Perro
+                    String name = Utils.askString(scan, "Enter dog name: ");
+                    String breed = Utils.askString(scan, "Enter breed: ");
+                    int age = Utils.askInt(scan, "Enter age: ");
+                    Service.createDog(name, breed, age, repo); // Enviamos los datos recolectados al Service
+                    break;
+
+                case "2": // Listar todos los perros
+                    System.out.println("\n--- CURRENT DOGS IN SYSTEM ---");
+                    for (Dog d : Service.getAllDogs(repo)) {
+                        System.out.println(d); // Muestra los datos del molde usando su método toString()
+                    }
+                    break;
+
+                case "3": // Buscar por ID
+                    String searchId = Utils.askString(scan, "Enter Dog ID to find: ");
+                    Service.getDogById(searchId, repo);
+                    break;
+
+                case "4": // Actualizar Perro
+                    String updateId = Utils.askString(scan, "Enter Dog ID to update: ");
+                    String newName = Utils.askString(scan, "Enter new name: ");
+                    String newBreed = Utils.askString(scan, "Enter new breed: ");
+                    int newAge = Utils.askInt(scan, "Enter new age: ");
+                    Service.updateDog(updateId, newName, newBreed, newAge, repo);
+                    break;
+
+                case "5": // Eliminar Perro
+                    String deleteId = Utils.askString(scan, "Enter Dog ID to delete: ");
+                    Service.deleteDog(deleteId, repo);
                     break;
 
                 case "6": // Volver al Menú Principal

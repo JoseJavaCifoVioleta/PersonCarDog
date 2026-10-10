@@ -264,4 +264,94 @@ public class Service {
         }
         return removed;
     }
+
+    // =========================================================================
+    // CAPÍTULO 3: OPERACIONES CRUD PARA PERROS (DOG)
+    // =========================================================================
+
+    // CREAR: Fabricamos un objeto 'Dog' (Model) y lo registramos en el almacén (Repository).
+    // Helsinki Cap. 5: Uso de constructores. Pasamos nombre, raza y edad para dar vida al objeto.
+    public static Dog createDog(String name, String breed, int age, Repository repo) {
+        System.out.println("Starting process to create a new Dog...");
+
+        // VALIDACIÓN: Lógica de control de Service. Evitamos nombres o razas vacías, y edades negativas.
+        if (name == null || name.trim().isEmpty() || breed == null || breed.trim().isEmpty() || age < 0) {
+            System.out.println("Error: Name and breed cannot be blank, and age must be valid.");
+            return null; // Si los datos son inválidos, el Chef (Service) rechaza la creación.
+        }
+
+        // Model en acción: Instanciamos el molde con los datos validados por el teclado.
+        Dog newDog = new Dog(name, breed, age);
+
+        // Repository en acción: Guardamos de forma persistente el perro en la lista del almacén.
+        repo.addDog(newDog);
+        System.out.println("Dog created and saved successfully to repository: " + newDog);
+        return newDog;
+    }
+
+    // LEER (UNO): Busca un perro específico en las listas del almacén usando su identificador único (ID).
+    // Helsinki Cap. 4: El bucle For-Each nos permite revisar uno a uno los perros guardados.
+    public static Dog getDogById(String id, Repository repo) {
+        System.out.println("Searching repository for Dog ID: " + id);
+
+        for (Dog d : repo.getAllDogs()) {
+            if (d.getId().equals(id)) {
+                System.out.println("Match found: " + d.getName() + " (" + d.getBreed() + ")");
+                return d; // Si los IDs coinciden, devolvemos el objeto y se detiene la búsqueda.
+            }
+        }
+        System.out.println("Dog with ID " + id + " not found in our records.");
+        return null;
+    }
+
+    // LEER (TODOS): Recupera la colección completa de perros de la memoria compartida.
+    // Operación de consulta pura: Permite listar los datos sin realizar ninguna modificación.
+    public static ArrayList<Dog> getAllDogs(Repository repo) {
+        System.out.println("Retrieving complete list of dogs from repository...");
+        return repo.getAllDogs();
+    }
+
+    // ACTUALIZAR: Modifica las características de un perro existente tras validar los nuevos campos.
+    // Helsinki Cap. 5: Modificación de estados internos de un objeto mediante métodos 'setter'.
+    public static boolean updateDog(String id, String newName, String newBreed, int newAge, Repository repo) {
+        System.out.println("Starting update process for Dog ID: " + id);
+
+        // Buscamos si el perro existe en la despensa (Repository) antes de intentar cambiar nada.
+        Dog target = getDogById(id, repo);
+        if (target == null) {
+            return false;
+        }
+
+        // Aplicamos el filtro de seguridad de las reglas de negocio.
+        if (newName == null || newName.trim().isEmpty() || newBreed == null || newBreed.trim().isEmpty() || newAge < 0) {
+            System.out.println("Error: New update values for Dog are invalid.");
+            return false;
+        }
+
+        // Reescribimos los atributos del objeto que vive dentro del repositorio.
+        target.setName(newName);
+        target.setBreed(newBreed);
+        target.setAge(newAge);
+        System.out.println("Dog fields updated successfully: " + target);
+        return true;
+    }
+
+    // BORRAR: Elimina físicamente el registro de un perro del almacén de memoria.
+    // Nota de diseño: El enunciado menciona que no hay reglas complejas de adopción o dueños todavía,
+    // por lo que procedemos al borrado directo de la lista del Repository una vez localizado.
+    public static boolean deleteDog(String id, Repository repo) {
+        System.out.println("Starting deletion process for Dog ID: " + id);
+
+        Dog target = getDogById(id, repo);
+        if (target == null) {
+            return false;
+        }
+
+        // Borramos el objeto directamente de la lista ArrayList interna del repositorio.
+        boolean removed = repo.getAllDogs().remove(target);
+        if (removed) {
+            System.out.println("Dog has been completely removed from the system.");
+        }
+        return removed;
+    }
 }
