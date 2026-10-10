@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.model.Car;
+import org.example.model.CarTransaction;
 import org.example.model.Person;
 import org.example.model.Dog;
 import org.example.repository.Repository;
@@ -48,16 +49,13 @@ public class Controller {
                         System.out.println("No hay suficientes personas en el repositorio.");
                     }
                     break;
-
                 case "5":
-                    // Temporalmente dejamos este aviso hasta que hagamos el commit de Transacciones
-                    System.out.println("Car Transactions - not implemented yet.");
+                    // Redirigimos el flujo hacia la lectura exclusiva de transacciones
+                    manageTransactionMenu(scan, repo);
                     break;
-
                 case "6": // CASO 6: Cierra el programa de forma correcta
                     System.out.println("Goodbye!");
                     return; // Rompe el bucle principal y finaliza la aplicación
-
                 default:
                     System.out.println("Invalid option, try again.");
             }
@@ -83,8 +81,8 @@ public class Controller {
                 case "2": // CASO 2: Listar todas las personas
                     System.out.println("\n--- CURRENT PEOPLE IN SYSTEM ---");
                     // Obtenemos la lista y la recorremos con un bucle for-each (Helsinki Cap. 4)
-                    for (Person p : Service.getAllPeople(repo)) {
-                        System.out.println(p + " | Car: " + (p.getCar() != null ? p.getCar().getMake() : "None"));
+                    for (Person currentPerson  : Service.getAllPeople(repo)) {
+                        System.out.println(currentPerson  + " | Car: " + (currentPerson .getCar() != null ? currentPerson .getCar().getMake() : "None"));
                     }
                     break;
 
@@ -132,8 +130,8 @@ public class Controller {
 
                 case "2": // Listar todos los coches
                     System.out.println("\n--- CURRENT CARS IN SYSTEM ---");
-                    for (Car c : Service.getAllCars(repo)) {
-                        System.out.println(c); // Imprime el molde del coche usando su método toString()
+                    for (Car currentCar : Service.getAllCars(repo)) {
+                        System.out.println(currentCar); // Imprime el molde del coche usando su método toString()
                     }
                     break;
 
@@ -182,8 +180,8 @@ public class Controller {
 
                 case "2": // Listar todos los perros
                     System.out.println("\n--- CURRENT DOGS IN SYSTEM ---");
-                    for (Dog d : Service.getAllDogs(repo)) {
-                        System.out.println(d); // Muestra los datos del molde usando su método toString()
+                    for (Dog currentDog : Service.getAllDogs(repo)) {
+                        System.out.println(currentDog); // Muestra los datos del molde usando su método toString()
                     }
                     break;
 
@@ -206,6 +204,35 @@ public class Controller {
                     break;
 
                 case "6": // Volver al Menú Principal
+                    return;
+
+                default:
+                    System.out.println("Invalid option, try again.");
+            }
+        }
+    }
+    // =========================================================================
+    // SUBMENÚ DE TRANSACCIONES: Interfaz de Solo Lectura (Read-Only) !!!!!!!!!
+    // =========================================================================
+    private static void manageTransactionMenu(Scanner scan, Repository repo) {
+        while (true) {
+            Utils.carTransactionMenu(); // Pintamos el menú especial de transacciones (Read-Only)
+            String option = Utils.askMenuOption(scan);
+
+            switch (option) {
+                case "1": // Listar todas las transacciones históricas
+                    System.out.println("\n--- CAR TRANSACTION HISTORICAL LOGS ---");
+                    for (CarTransaction currentTransaction : Service.getAllCarTransactions(repo)) {
+                        System.out.println(currentTransaction); // Imprime el registro inalterable generado por el sistema
+                    }
+                    break;
+
+                case "2": // Buscar una transacción concreta por su identificador único
+                    String searchId = Utils.askString(scan, "Enter Transaction ID to find: ");
+                    Service.getCarTransactionById(searchId, repo);
+                    break;
+
+                case "3": // Volver al Menú Principal
                     return;
 
                 default:

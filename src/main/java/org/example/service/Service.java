@@ -98,10 +98,10 @@ public class Service {
     public static Person getPersonById(String id, Repository repo) {
         System.out.println("Searching for person with ID: " + id);
 
-        for (Person p : repo.getAllPeople()) {
-            if (p.getId().equals(id)) {
-                System.out.println("Match found: " + p.getName());
-                return p; // Si lo encuentra, rompe la búsqueda inmediatamente y devuelve a la persona.
+        for (Person currentPerson : repo.getAllPeople()) {
+            if (currentPerson.getId().equals(id)) {
+                System.out.println("Match found: " + currentPerson.getName());
+                return currentPerson; // Si lo encuentra, rompe la búsqueda inmediatamente y devuelve a la persona.
             }
         }
         System.out.println("Person with ID " + id + " not found in our records.");
@@ -196,10 +196,10 @@ public class Service {
         System.out.println("Searching repository for Car ID: " + id);
 
         // Recorremos la lista que nos da el Repository buscando una coincidencia de ID.
-        for (Car c : repo.getAllCars()) {
-            if (c.getId().equals(id)) {
-                System.out.println("Match found: " + c.getMake() + " " + c.getModel());
-                return c; // Si lo encuentra, devuelve el coche y termina la función.
+        for (Car currentCar : repo.getAllCars()) {
+            if (currentCar.getId().equals(id)) {
+                System.out.println("Match found: " + currentCar.getMake() + " " + currentCar.getModel());
+                return currentCar; // Si lo encuentra, devuelve el coche y termina la función.
             }
         }
         System.out.println("Car with ID " + id + " not found in our records.");
@@ -250,10 +250,10 @@ public class Service {
         }
 
         // Helsinki Cap. 4 y 5: Recorremos los dueños para limpiar referencias rotas en la memoria.
-        for (Person p : repo.getAllPeople()) {
-            if (p.getCar() != null && p.getCar().equals(target)) {
-                System.out.println("Safety Check: Removing car link from owner: " + p.getName());
-                p.setCar(null); // Desvinculamos el coche de la persona para mantener los datos limpios.
+        for (Person currentPerson : repo.getAllPeople()) {
+            if (currentPerson.getCar() != null && currentPerson.getCar().equals(target)) {
+                System.out.println("Safety Check: Removing car link from owner: " + currentPerson.getName());
+                currentPerson.setCar(null); // Desvinculamos el coche de la persona para mantener los datos limpios.
             }
         }
 
@@ -294,10 +294,10 @@ public class Service {
     public static Dog getDogById(String id, Repository repo) {
         System.out.println("Searching repository for Dog ID: " + id);
 
-        for (Dog d : repo.getAllDogs()) {
-            if (d.getId().equals(id)) {
-                System.out.println("Match found: " + d.getName() + " (" + d.getBreed() + ")");
-                return d; // Si los IDs coinciden, devolvemos el objeto y se detiene la búsqueda.
+        for (Dog currentDog : repo.getAllDogs()) {
+            if (currentDog.getId().equals(id)) {
+                System.out.println("Match found: " + currentDog.getName() + " (" + currentDog.getBreed() + ")");
+                return currentDog; // Si los IDs coinciden, devolvemos el objeto y se detiene la búsqueda.
             }
         }
         System.out.println("Dog with ID " + id + " not found in our records.");
@@ -353,5 +353,33 @@ public class Service {
             System.out.println("Dog has been completely removed from the system.");
         }
         return removed;
+    }
+
+    // =========================================================================
+    // CAPÍTULO 4: HISTORIAL DE TRANSACCIONES (READ-ONLY)
+    // =========================================================================
+
+    // LEER (UNO): Busca un recibo de compraventa específico en el repositorio usando su ID único.
+    // Helsinki Cap. 4: Uso de bucle For-Each para examinar la colección histórica.
+    public static CarTransaction getCarTransactionById(String id, Repository repo) {
+        System.out.println("Searching repository for Transaction ID: " + id);
+
+        // Recorremos la lista del repositorio para localizar el recibo coincidente.
+        for (CarTransaction currentTransaction : repo.getAllCarTransactions()) {
+            if (currentTransaction.getId().equals(id)) {
+                System.out.println("Match found! Transaction details retrieved.");
+                return currentTransaction; // Si coincide el ID, devolvemos el registro histórico.
+            }
+        }
+        System.out.println("Transaction with ID " + id + " not found in the historical logs.");
+        return null;
+    }
+
+    // LEER (TODOS): Recupera todo el historial de compras guardado en el sistema.
+    // Regla de Negocio: Al ser una operación Read-Only, no proporcionamos ningún método
+    // para crear, modificar o borrar registros aquí. Protegemos el historial de manipulaciones externas.
+    public static ArrayList<CarTransaction> getAllCarTransactions(Repository repo) {
+        System.out.println("Retrieving complete historical log of car transactions...");
+        return repo.getAllCarTransactions();
     }
 }
