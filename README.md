@@ -115,25 +115,31 @@ Implementó el caso de uso central y la infraestructura de soporte:
 
 ## 6. Cómo ejecutar
 
+Requiere **Java 21** (no hace falta tener Maven instalado, se usa el *wrapper* incluido). Si tu sistema no tiene la 21 activa por defecto, apunta `JAVA_HOME` a una instalación 21.
+
 ```bash
-# Compilar y ejecutar las pruebas
+# Compilar y ejecutar las pruebas (66 pruebas)
 mvnw.cmd clean test
 
-# Arrancar la aplicación
-mvnw.cmd exec:java "-Dexec.mainClass=org.example.App"
+# Compilar y arrancar la aplicación
+mvnw.cmd compile exec:java "-Dexec.mainClass=org.example.App"
 ```
+
+> **Nota:** `exec:java` ejecuta las clases ya compiladas, por eso se incluye `compile` en el mismo comando. Sin él, el arranque fallará si la carpeta `target/` está vacía.
 
 ---
 
 ## 7. Manual de uso
 
-Aplicación de consola. Toda la interacción se hace escribiendo números o texto y pulsando **Enter**. Los identificadores (ID) son cadenas únicas; para obtenerlos, usa las opciones *List all…* antes de operar.
+Aplicación de consola. Toda la interacción se hace escribiendo números o texto y pulsando **Enter**. Los identificadores (ID) son **UUID** únicos: para obtenerlos, usa primero las opciones *List all…* de cada menú y cópialos.
 
 ### 7.1 Arranque
 
 ```bash
-mvnw.cmd exec:java "-Dexec.mainClass=org.example.App"
+mvnw.cmd compile exec:java "-Dexec.mainClass=org.example.App"
 ```
+
+`exec:java` necesita las clases compiladas, por eso se incluye `compile` (véase el apartado 6).
 
 Al arrancar, la aplicación **carga datos de ejemplo automáticamente** (varias personas, coches, perros y algunas adopciones de custodia compartida), de modo que se puede probar sin crear nada antes.
 
