@@ -4,9 +4,9 @@ import com.github.javafaker.Faker;
 import org.example.model.Car;
 import org.example.model.CarTransaction;
 import org.example.model.Dog;
-import org.example.model.DogAdoption;
 import org.example.model.Person;
 import org.example.repository.Repository;
+import org.example.service.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,27 +84,22 @@ public class DataSeeder {
         );
         repo.addCarTransaction(tx2);
 
-        // 5. Seed at least 2 dogs already adopted (adopters adults)
-        if (temporaryPeople.size() > 0 && temporaryDogs.size() > 0) {
-            Person adopter1 = temporaryPeople.get(0);
-            Dog adoptedDog1 = temporaryDogs.get(2); // third dog
-            if (adopter1.getAge() >= 18 && adopter1.getDogs().isEmpty() && adoptedDog1.getOwners().isEmpty()) {
-                adopter1.getDogs().add(adoptedDog1);
-                adoptedDog1.getOwners().add(adopter1);
-                DogAdoption da1 = new DogAdoption(adopter1, adoptedDog1, new Date(), faker.number().numberBetween(0, 200), "Dog adopted for " + faker.number().numberBetween(0, 200));
-                repo.addDogAdoption(da1);
-            }
-        }
+        // 5. Seed adoptions exercising the shared-custody rules (spec section 6):
+        //    - one dog with two active owners
+        //    - one person with two active dogs
+        //    Every mutation goes through Service.adoptDog so the relationship
+        //    is maintained in a single place.
+        if (temporaryPeople.size() > 2 && temporaryDogs.size() > 2) {
+            Person ownerOne = temporaryPeople.get(0);
+            Person ownerTwo = temporaryPeople.get(2);
+            Dog sharedDog = temporaryDogs.get(2);
+            Dog secondDogForOwnerOne = temporaryDogs.get(0);
+            Dog secondDogForOwnerTwo = temporaryDogs.get(3);
 
-        if (temporaryPeople.size() > 1 && temporaryDogs.size() > 1) {
-            Person adopter2 = temporaryPeople.get(1);
-            Dog adoptedDog2 = temporaryDogs.get(3); // fourth dog
-            if (adopter2.getAge() >= 18 && adopter2.getDogs().isEmpty() && adoptedDog2.getOwners().isEmpty()) {
-                adopter2.getDogs().add(adoptedDog2);
-                adoptedDog2.getOwners().add(adopter2);
-                DogAdoption da2 = new DogAdoption(adopter2, adoptedDog2, new Date(), faker.number().numberBetween(0, 200), "Dog adopted for " + faker.number().numberBetween(0, 200));
-                repo.addDogAdoption(da2);
-            }
+            Service.adoptDog(ownerOne, sharedDog, faker.number().numberBetween(0, 200), repo);
+            Service.adoptDog(ownerTwo, sharedDog, faker.number().numberBetween(0, 200), repo);
+            Service.adoptDog(ownerOne, secondDogForOwnerOne, faker.number().numberBetween(0, 200), repo);
+            Service.adoptDog(ownerTwo, secondDogForOwnerTwo, faker.number().numberBetween(0, 200), repo);
         }
 
         // Print verification
