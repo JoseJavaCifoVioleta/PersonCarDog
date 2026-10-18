@@ -1,8 +1,8 @@
 package org.example.model;
 
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Dog {
 
@@ -10,7 +10,6 @@ public class Dog {
     private String name;
     private String breed;
     private int age;
-    private Person owner;
     private List<Person> owners = new ArrayList<>();
 
     public Dog() {}
@@ -54,32 +53,25 @@ public class Dog {
         this.id = id;
     }
 
-    public Person getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Person owner) {
-        this.owner = owner;
-    }
-
     public List<Person> getOwners() {
         return owners;
     }
 
-    public void setOwners(List<Person> owners) {
-        this.owners = owners;
-    }
+    // Setter isn't necessary anymore because Service must be the only one authorized to modify any lists.
+    // Also, we're no longer assigning dogs and people individually.
+    // Every dog has its own list of owners using the method "person.getOwners().add(owner);"
 
     @Override
     public String toString() {
-        StringBuilder ownerIds = new StringBuilder();
-        for (Person p : owners) {
-            if (ownerIds.length() > 0) {
-                ownerIds.append(", ");
-            }
-            ownerIds.append(p.getId());
+
+        // Preparing owner text
+        String ownersText = "";
+        for (Person owner : owners) {
+            ownersText = ownersText + owner.getName() + " (" + owner.getId() + "), ";
         }
+
+        // Returning all the information together
         return "Dog{id='" + id + "', name='" + name + "', breed='" + breed + "', age=" + age +
-                ", ownerIds=[" + ownerIds + "]}";
+                ", owners=" + ownersText + "}";
     }
 }

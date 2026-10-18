@@ -22,6 +22,17 @@ public class ResultOperation {
     }
 
     /**
+     * Convenience constructor for operations that only report a status
+     * ("SUCCESS" / "ERROR") plus a human readable message.
+     * Success is derived from the status; no payload and no entity type.
+     */
+    public ResultOperation(String status, String message) {
+        this.success = "SUCCESS".equalsIgnoreCase(status);
+        this.message = message;
+        this.timestamp = System.currentTimeMillis();
+    }
+
+    /**
      * Fluent setter without payload (failures and successful deletes).
      */
     public ResultOperation setter(boolean success, String message, String type, long timestamp) {
@@ -41,6 +52,20 @@ public class ResultOperation {
     }
 
     // ========== GETTERS ==========
+
+    /**
+     * Primary status line for the console: "SUCCESS" or "ERROR".
+     */
+    public String getResult() {
+        return success ? "SUCCESS" : "ERROR";
+    }
+
+    /**
+     * Human readable explanation of the outcome (null when not set).
+     */
+    public String getReason() {
+        return message;
+    }
 
     public boolean isSuccess() {
         return success;

@@ -88,9 +88,9 @@ public class DataSeeder {
         if (temporaryPeople.size() > 0 && temporaryDogs.size() > 0) {
             Person adopter1 = temporaryPeople.get(0);
             Dog adoptedDog1 = temporaryDogs.get(2); // third dog
-            if (adopter1.getAge() >= 18 && adopter1.getDog() == null && adoptedDog1.getOwner() == null) {
-                adopter1.setDog(adoptedDog1);
-                adoptedDog1.setOwner(adopter1);
+            if (adopter1.getAge() >= 18 && adopter1.getDogs().isEmpty() && adoptedDog1.getOwners().isEmpty()) {
+                adopter1.getDogs().add(adoptedDog1);
+                adoptedDog1.getOwners().add(adopter1);
                 DogAdoption da1 = new DogAdoption(adopter1, adoptedDog1, new Date(), faker.number().numberBetween(0, 200), "Dog adopted for " + faker.number().numberBetween(0, 200));
                 repo.addDogAdoption(da1);
             }
@@ -99,9 +99,9 @@ public class DataSeeder {
         if (temporaryPeople.size() > 1 && temporaryDogs.size() > 1) {
             Person adopter2 = temporaryPeople.get(1);
             Dog adoptedDog2 = temporaryDogs.get(3); // fourth dog
-            if (adopter2.getAge() >= 18 && adopter2.getDog() == null && adoptedDog2.getOwner() == null) {
-                adopter2.setDog(adoptedDog2);
-                adoptedDog2.setOwner(adopter2);
+            if (adopter2.getAge() >= 18 && adopter2.getDogs().isEmpty() && adoptedDog2.getOwners().isEmpty()) {
+                adopter2.getDogs().add(adoptedDog2);
+                adoptedDog2.getOwners().add(adopter2);
                 DogAdoption da2 = new DogAdoption(adopter2, adoptedDog2, new Date(), faker.number().numberBetween(0, 200), "Dog adopted for " + faker.number().numberBetween(0, 200));
                 repo.addDogAdoption(da2);
             }

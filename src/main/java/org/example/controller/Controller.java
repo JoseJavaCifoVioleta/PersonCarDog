@@ -4,7 +4,7 @@ package org.example.controller;
 import org.example.model.Car;
 import org.example.model.Dog;
 import org.example.model.Person;
-import org.example.model.ResultOperation;
+import org.example.utils.ResultOperation;
 import org.example.repository.Repository;
 import org.example.service.Service;
 import org.example.utils.DataSeeder;
@@ -101,7 +101,7 @@ public class Controller {
                 case "5":
                     String did = Utils.askString(
                             scan, "Enter person ID to delete: ");
-                    Service.deletePerson(did, repo);
+                    printResult(Service.deletePerson(did, repo));
                     break;
 
                 case "6":
@@ -152,7 +152,7 @@ public class Controller {
                 case "5":
                     String delId = Utils.askString(
                             scan, "Enter dog ID to delete: ");
-                    Service.deleteDog(delId, repo);
+                    printResult(Service.deleteDog(delId, repo));
                     break;
 
                 case "6":
@@ -255,13 +255,16 @@ public class Controller {
             System.out.println(
                     "Need at least two people. Creating demo people...");
 
-            Person seller = Service.createPerson("DemoSeller", 30, repo);
+            Person seller = (Person) Service
+                    .createPerson("DemoSeller", 30, repo)
+                    .getUpdatedObject();
             Service.createPerson("DemoBuyer", 25, repo);
 
-            Car demoCar = Service.createCar(
-                    "DemoMake", "DemoModel", 2020, repo);
+            Car demoCar = (Car) Service
+                    .createCar("DemoMake", "DemoModel", 2020, repo)
+                    .getUpdatedObject();
 
-            if (seller != null) {
+            if (seller != null && demoCar != null) {
                 seller.setCar(demoCar);
             }
 
@@ -311,7 +314,7 @@ public class Controller {
                 case "2":
                     String adoptionId = Utils.askString(
                             scan, "Enter adoption ID: ");
-                    Service.getDogAdoptionById(adoptionId, repo);
+                    printResult(Service.getDogAdoptionById(adoptionId, repo));
                     break;
 
                 case "3":

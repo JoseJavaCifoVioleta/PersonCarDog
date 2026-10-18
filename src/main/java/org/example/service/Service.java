@@ -81,19 +81,18 @@ public class Service {
         return result.setter(true, "Person updated successfully.", "Person", System.currentTimeMillis(), p);
     }
 
-    public static boolean deletePerson(String id, Repository repo) {
+    public static ResultOperation deletePerson(String id, Repository repo) {
         System.out.println("Welcome to DELETE PERSON");
+        ResultOperation result = new ResultOperation();
 
         if (id == null || id.trim().isEmpty()) {
-            System.out.println("ID cannot be empty.");
-            return false;
+            return result.setter(false, "ID cannot be empty.", "Person", System.currentTimeMillis());
         }
 
         Person p = repo.getPersonById(id.trim());
 
         if (p == null) {
-            System.out.println("Person not found.");
-            return false;
+            return result.setter(false, "Person not found.", "Person", System.currentTimeMillis());
         }
 
         // Clear car reference
@@ -125,11 +124,7 @@ public class Service {
 
         boolean removed = repo.removePerson(id.trim());
 
-        if (removed) {
-            System.out.println("Person deleted successfully.");
-        }
-
-        return removed;
+        return result.setter(removed, "Person deleted successfully.", "Person", System.currentTimeMillis());
     }
 
     // ========== CAR CRUD ==========
@@ -299,19 +294,18 @@ public class Service {
         return result.setter(true, "Dog updated successfully.", "Dog", System.currentTimeMillis(), d);
     }
 
-    public static boolean deleteDog(String id, Repository repo) {
+    public static ResultOperation deleteDog(String id, Repository repo) {
         System.out.println("Welcome to DELETE DOG");
+        ResultOperation result = new ResultOperation();
 
         if (id == null || id.trim().isEmpty()) {
-            System.out.println("ID cannot be empty.");
-            return false;
+            return result.setter(false, "ID cannot be empty.", "Dog", System.currentTimeMillis());
         }
 
         Dog dog = repo.getDogById(id.trim());
 
         if (dog == null) {
-            System.out.println("Dog not found.");
-            return false;
+            return result.setter(false, "Dog not found.", "Dog", System.currentTimeMillis());
         }
 
         // Close active adoptions involving this dog
@@ -338,11 +332,7 @@ public class Service {
 
         boolean removed = repo.removeDog(id.trim());
 
-        if (removed) {
-            System.out.println("Dog deleted successfully.");
-        }
-
-        return removed;
+        return result.setter(removed, "Dog deleted successfully.", "Dog", System.currentTimeMillis());
     }
 
     // ========== CAR TRANSACTION (READ ONLY) ==========
@@ -479,15 +469,16 @@ public class Service {
 
     public static ResultOperation returnDog(
             Person person, Dog dog, Repository repo) {
+        ResultOperation result = new ResultOperation();
 
         if (person == null
                 || repo.getPersonById(person.getId()) == null) {
-            return new ResultOperation("ERROR", "Person not found");
+            return result.setter(false, "Person not found", "DogAdoption", System.currentTimeMillis());
         }
 
         if (dog == null
                 || repo.getDogById(dog.getId()) == null) {
-            return new ResultOperation("ERROR", "Dog not found");
+            return result.setter(false, "Dog not found", "DogAdoption", System.currentTimeMillis());
         }
 
         for (DogAdoption adoption : repo.getAllDogAdoptions()) {
@@ -507,59 +498,58 @@ public class Service {
                                 + " - RETURNED"
                 );
 
-                return new ResultOperation(
-                        "SUCCESS", "Dog returned successfully");
+                return result.setter(true, "Dog returned successfully", "DogAdoption", System.currentTimeMillis(), adoption);
             }
         }
 
-        return new ResultOperation(
-                "ERROR", "No active adoption found");
+        return result.setter(false, "No active adoption found", "DogAdoption", System.currentTimeMillis());
     }
 
     public static ResultOperation getDogsByOwner(
             Person owner, Repository repo) {
+        ResultOperation result = new ResultOperation();
 
         if (owner == null
                 || repo.getPersonById(owner.getId()) == null) {
-            return new ResultOperation("ERROR", "Person not found");
+            return result.setter(false, "Person not found", "Dog", System.currentTimeMillis());
         }
 
-        return new ResultOperation(
-                "SUCCESS", owner.getDogs().toString());
+        return result.setter(true,
+                "Dogs of " + owner.getName() + ": " + owner.getDogs().size(),
+                "Dog", System.currentTimeMillis(), owner.getDogs());
     }
 
     public static ResultOperation getOwnersByDog(
             Dog dog, Repository repo) {
+        ResultOperation result = new ResultOperation();
 
         if (dog == null
                 || repo.getDogById(dog.getId()) == null) {
-            return new ResultOperation("ERROR", "Dog not found");
+            return result.setter(false, "Dog not found", "Person", System.currentTimeMillis());
         }
 
-        return new ResultOperation(
-                "SUCCESS", dog.getOwners().toString());
+        return result.setter(true,
+                "Owners of " + dog.getName() + ": " + dog.getOwners().size(),
+                "Person", System.currentTimeMillis(), dog.getOwners());
     }
 
-    public static DogAdoption getDogAdoptionById(
+    public static ResultOperation getDogAdoptionById(
             String id, Repository repo) {
 
         System.out.println("Welcome to GET ADOPTION BY ID");
+        ResultOperation result = new ResultOperation();
 
         if (id == null || id.trim().isEmpty()) {
-            System.out.println("ID cannot be empty.");
-            return null;
+            return result.setter(false, "ID cannot be empty.", "DogAdoption", System.currentTimeMillis());
         }
 
         DogAdoption dg = repo.getDogAdoptionById(id.trim());
 
         if (dg == null) {
-            System.out.println(
-                    "DogAdoption not found with id: " + id);
-        } else {
-            System.out.println("Found: " + dg);
+            return result.setter(false, "DogAdoption not found with id: " + id, "DogAdoption", System.currentTimeMillis());
         }
 
-        return dg;
+        return result.setter(true, "DogAdoption found.", "DogAdoption", System.currentTimeMillis(), dg);
     }
 
     public static ResultOperation getAllDogAdoptions(Repository repo) {
