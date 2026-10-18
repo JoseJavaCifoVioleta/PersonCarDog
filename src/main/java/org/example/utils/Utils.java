@@ -31,9 +31,12 @@ public class Utils {
         System.out.println("3. Car operations");
         System.out.println("4. Buy a car (person to person)");
         System.out.println("5. View car transactions (read only)");
-        System.out.println("6. Adopt a dog (person <- dog)");
-        System.out.println("7. View dog adoptions (read only)");
-        System.out.println("8. Quit");
+        System.out.println("6. Adopt a dog (shared custody)");
+        System.out.println("7. Return a dog (end one adoption)");
+        System.out.println("8. View dog adoptions (read only)");
+        System.out.println("9. Save repository to JSON file");
+        System.out.println("10. Load repository from JSON file");
+        System.out.println("11. Quit");
     }
 
     public static void personMenu() {
@@ -74,9 +77,11 @@ public class Utils {
     }
 
     public static void dogAdoptionMenu() {
-        System.out.println("\n===== DOG ADOPTIONS (READ ONLY) =====");
+        System.out.println("\n===== DOG ADOPTIONS / CUSTODY (READ ONLY) =====");
         System.out.println("1. List all adoptions");
         System.out.println("2. Find adoption by ID");
-        System.out.println("3. Back");
+        System.out.println("3. List dogs of a person (by ID)");
+        System.out.println("4. List owners of a dog (by ID)");
+        System.out.println("5. Back");
     }
 }

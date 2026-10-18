@@ -4,9 +4,9 @@ import com.github.javafaker.Faker;
 import org.example.model.Car;
 import org.example.model.CarTransaction;
 import org.example.model.Dog;
-import org.example.model.DogAdoption;
 import org.example.model.Person;
 import org.example.repository.Repository;
+import org.example.service.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,8 +19,9 @@ public class DataSeeder {
 
         List<Car> temporaryCars = new ArrayList<>();
         List<Person> temporaryPeople = new ArrayList<>();
+        List<Dog> temporaryDogs = new ArrayList<>();
 
-        //  1. Generate 3 Cars (Objects 1, 2 y 3)
+        // 1. Generate 3 Cars
         for (int i = 0; i < 3; i++) {
             Car car = new Car(
                     faker.company().name(),
@@ -31,8 +32,8 @@ public class DataSeeder {
             temporaryCars.add(car);
         }
 
-        // 2. Generate 3 People (Objects 4, 5 y 6)
-        for (int i = 0; i < 3; i++) {
+        // 2. Generate 5 People (all adults so they are allowed to adopt)
+        for (int i = 0; i < 5; i++) {
             Person person = new Person(
                     faker.name().fullName(),
                     faker.number().numberBetween(18, 80)
@@ -40,22 +41,17 @@ public class DataSeeder {
             temporaryPeople.add(person);
         }
 
-        // Service.buyCar needs a valid seller and buyer
-        // so we assign the first car to the first person
-        temporaryPeople.get(0).setCar(temporaryCars.get(0));
-
-        // Person 1 will not have a car
-        // Person 2 will have a random car
-        temporaryPeople.get(2).setCar(temporaryCars.get(1));
-
-        // Add people to repository
         for (Person p : temporaryPeople) {
             repo.addPerson(p);
         }
 
-        // 3. Generate 4 Dogs (Objects 7, 8, 9, 10) - include 2 already adopted
-        List<Dog> temporaryDogs = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        // Cars for the buyCar demo: the demo seller (index 0) must own a car
+        // and the demo buyer (index 1) must not.
+        temporaryPeople.get(0).setCar(temporaryCars.get(0));
+        temporaryPeople.get(2).setCar(temporaryCars.get(1));
+
+        // 3. Generate 5 Dogs
+        for (int i = 0; i < 5; i++) {
             Dog dog = new Dog(
                     faker.dog().name(),
                     faker.dog().breed(),
@@ -65,10 +61,10 @@ public class DataSeeder {
             temporaryDogs.add(dog);
         }
 
-        // 4. Generate 2 fake transactions
+        // 4. Fake transactions (demo data, unchanged)
         CarTransaction tx1 = new CarTransaction(
-                temporaryPeople.get(1), // buyer
-                temporaryPeople.get(2), // seller
+                temporaryPeople.get(1),
+                temporaryPeople.get(2),
                 new Date(),
                 temporaryCars.get(2),
                 faker.lorem().sentence()
@@ -84,34 +80,40 @@ public class DataSeeder {
         );
         repo.addCarTransaction(tx2);
 
-        // 5. Seed at least 2 dogs already adopted (adopters adults)
-        if (temporaryPeople.size() > 0 && temporaryDogs.size() > 0) {
-            Person adopter1 = temporaryPeople.get(0);
-            Dog adoptedDog1 = temporaryDogs.get(2); // third dog
-            if (adopter1.getAge() >= 18 && adopter1.getDog() == null && adoptedDog1.getOwner() == null) {
-                adopter1.setDog(adoptedDog1);
-                adoptedDog1.setOwner(adopter1);
-                DogAdoption da1 = new DogAdoption(adopter1, adoptedDog1, new Date(), faker.number().numberBetween(0, 200), "Dog adopted for " + faker.number().numberBetween(0, 200));
-                repo.addDogAdoption(da1);
-            }
-        }
+        // 5. Seed many-to-many adoptions through the Service, so that every
+        //    relationship mutation stays inside the business layer.
+        int[][] adoptionPlan = {
+                {0, 0}, // person 0 adopts dog 0
+                {1, 0}, // person 1 adopts dog 0  -> dog 0 now has 2 owners (max)
+                {0, 1}, // person 0 adopts dog 1
+                {2, 2}, // person 2 adopts dog 2
+                {3, 2}, // person 3 adopts dog 2  -> dog 2 now has 2 owners (max)
+                {4, 3}, // person 4 adopts dog 3
+                {0, 4}  // person 0 adopts dog 4  -> person 0 now has 3 dogs (max)
+        };
 
-        if (temporaryPeople.size() > 1 && temporaryDogs.size() > 1) {
-            Person adopter2 = temporaryPeople.get(1);
-            Dog adoptedDog2 = temporaryDogs.get(3); // fourth dog
-            if (adopter2.getAge() >= 18 && adopter2.getDog() == null && adoptedDog2.getOwner() == null) {
-                adopter2.setDog(adoptedDog2);
-                adoptedDog2.setOwner(adopter2);
-                DogAdoption da2 = new DogAdoption(adopter2, adoptedDog2, new Date(), faker.number().numberBetween(0, 200), "Dog adopted for " + faker.number().numberBetween(0, 200));
-                repo.addDogAdoption(da2);
+        int seeded = 0;
+        for (int[] pair : adoptionPlan) {
+            Person adopter = temporaryPeople.get(pair[0]);
+            Dog dog = temporaryDogs.get(pair[1]);
+            int fee = faker.number().numberBetween(0, 200);
+            ResultOperation res = Service.adoptDog(adopter, dog, fee, repo);
+            if (res.isSuccess()) {
+                seeded++;
             }
         }
 
         // Print verification
         System.out.println("=== DATA SEEDING COMPLETE ===");
-        System.out.println("People: " + repo.getAllPeople().size() + " | Cars: " + repo.getAllCars().size() + " | Dogs: " + repo.getAllDogs().size() + " | Transactions: " + repo.getAllCarTransactions().size() + " | Adoptions: " + repo.getAllDogAdoptions().size());
+        System.out.println("People: " + repo.getAllPeople().size()
+                + " | Cars: " + repo.getAllCars().size()
+                + " | Dogs: " + repo.getAllDogs().size()
+                + " | Transactions: " + repo.getAllCarTransactions().size()
+                + " | Adoptions: " + repo.getAllDogAdoptions().size()
+                + " (seeded via Service: " + seeded + ")");
+        System.out.println("Shared-custody examples: dog '" + temporaryDogs.get(0).getName()
+                + "' has 2 owners; person '" + temporaryPeople.get(0).getName()
+                + "' has 3 dogs (both at their maximum).");
         System.out.println("================================");
-        System.out.println("TOTAL NEW INSTANCIES AT REPO: 10+");
-        System.out.println("=============================");
     }
 }

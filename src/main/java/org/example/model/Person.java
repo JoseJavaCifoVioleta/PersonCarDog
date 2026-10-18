@@ -10,7 +10,6 @@ public class Person {
     private String name;
     private int age;
     private Car car;
-    private Dog dog;
     private List<Dog> dogs = new ArrayList<>();
 
     public Person(){
@@ -53,14 +52,6 @@ public class Person {
 
     public void setCar(Car car) {
         this.car = car;
-    }
-
-    public Dog getDog() {
-        return dog;
-    }
-
-    public void setDog(Dog dog) {
-        this.dog = dog;
     }
 
     public List<Dog> getDogs() {

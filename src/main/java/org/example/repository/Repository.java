@@ -135,4 +135,21 @@ public class Repository {
     public boolean removeDogAdoption(String id) {
         return dogAdoptions.removeIf(da -> da.getId().equals(id));
     }
+
+    // ===== Reset / reload helpers =====
+    public void clear() {
+        people.clear();
+        cars.clear();
+        dogs.clear();
+        carTransactions.clear();
+        dogAdoptions.clear();
+    }
+
+    public boolean isEmpty() {
+        return people.isEmpty()
+                && cars.isEmpty()
+                && dogs.isEmpty()
+                && carTransactions.isEmpty()
+                && dogAdoptions.isEmpty();
+    }
 }

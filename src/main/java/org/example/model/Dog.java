@@ -10,10 +10,11 @@ public class Dog {
     private String name;
     private String breed;
     private int age;
-    private Person owner;
     private List<Person> owners = new ArrayList<>();
 
-    public Dog() {}
+    public Dog() {
+        this.id = UUID.randomUUID().toString();
+    }
 
     public Dog(String name, String breed, int age) {
         this.id = UUID.randomUUID().toString();
@@ -52,14 +53,6 @@ public class Dog {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Person getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Person owner) {
-        this.owner = owner;
     }
 
     public List<Person> getOwners() {

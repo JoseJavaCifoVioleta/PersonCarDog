@@ -21,7 +21,7 @@ Reglas de negocio contempladas:
 ## 3. Alcance completado (capa Service)
 
 Se han implementado o refactorizado los siguientes métodos en
-`src/main/java/org/example/service/Service.java`:
+`../../src/main/java/org/example/service/Service.java`:
 
 | Método | Descripción |
 |---|---|
@@ -46,7 +46,7 @@ Con el fin de permitir el desarrollo y las pruebas de la capa `Service` antes de
 
 Las versiones provisionales están diseñadas para ser **sustituidas** por las definitivas. Su carácter *superset* garantiza que el proyecto compile y que los flujos previos (CRUD, `buyCar`, adopción 1:1) continúen operativos durante la transición.
 
-Ubicación: `src/main/java/org/example/model/` (`Person.java`, `Dog.java`, `DogAdoption.java`).
+Ubicación: `../../src/main/java/org/example/model` (`Person.java`, `Dog.java`, `DogAdoption.java`).
 
 ## 5. Verificación
 

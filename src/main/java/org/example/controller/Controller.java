@@ -54,9 +54,18 @@ public class Controller {
                     adoptDogFlow(scan, repo);
                     break;
                 case "7":
-                    dogAdoptionSubMenu(scan, repo);
+                    returnDogFlow(scan, repo);
                     break;
                 case "8":
+                    dogAdoptionSubMenu(scan, repo);
+                    break;
+                case "9":
+                    System.out.println("Save repository to JSON file: not implemented yet (pending feature).");
+                    break;
+                case "10":
+                    System.out.println("Load repository from JSON file: not implemented yet (pending feature).");
+                    break;
+                case "11":
                     System.out.println("Goodbye!");
                     return;
                 default:
@@ -214,6 +223,12 @@ public class Controller {
                     System.out.println("resultOperation: " + resById);
                     break;
                 case "3":
+                    listDogsOfPersonFlow(scan, repo);
+                    break;
+                case "4":
+                    listOwnersOfDogFlow(scan, repo);
+                    break;
+                case "5":
                     return;
                 default:
                     System.out.println("Invalid option.");
@@ -221,8 +236,24 @@ public class Controller {
         }
     }
 
+    // ===== DOG CUSTODY (READ ONLY) FLOWS =====
+    private static void listDogsOfPersonFlow(Scanner scan, Repository repo) {
+        String pid = Utils.askString(scan, "Enter person ID: ");
+        Person person = repo.getPersonById(pid.trim());
+        ResultOperation res = Service.getDogsByOwner(person, repo);
+        System.out.println("resultOperation: " + res);
+    }
+
+    private static void listOwnersOfDogFlow(Scanner scan, Repository repo) {
+        String did = Utils.askString(scan, "Enter dog ID: ");
+        Dog dog = repo.getDogById(did.trim());
+        ResultOperation res = Service.getOwnersByDog(dog, repo);
+        System.out.println("resultOperation: " + res);
+    }
+
+    // ===== ADOPT / RETURN FLOWS =====
     private static void adoptDogFlow(Scanner scan, Repository repo) {
-        System.out.println("Welcome to ADOPT A DOG (person <- dog)");
+        System.out.println("Welcome to ADOPT A DOG (shared custody)");
         String pid = Utils.askString(scan, "Enter person ID: ");
         String did = Utils.askString(scan, "Enter dog ID: ");
         int fee = Utils.askInt(scan, "Enter adoption fee: ");
@@ -231,6 +262,18 @@ public class Controller {
         Dog dog = repo.getDogById(did.trim());
 
         ResultOperation res = Service.adoptDog(adopter, dog, fee, repo);
+        System.out.println("resultOperation: " + res);
+    }
+
+    private static void returnDogFlow(Scanner scan, Repository repo) {
+        System.out.println("Welcome to RETURN A DOG (end one adoption)");
+        String pid = Utils.askString(scan, "Enter person ID: ");
+        String did = Utils.askString(scan, "Enter dog ID: ");
+
+        Person person = repo.getPersonById(pid.trim());
+        Dog dog = repo.getDogById(did.trim());
+
+        ResultOperation res = Service.returnDog(person, dog, repo);
         System.out.println("resultOperation: " + res);
     }
 
