@@ -1,6 +1,8 @@
 package org.example.model;
 
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Person {
 
@@ -8,7 +10,7 @@ public class Person {
     private String name;
     private int age;
     private Car car;
-    private Dog dog;
+    private List<Dog> dogs = new ArrayList<>();
 
     public Person(){
         this.id = UUID.randomUUID().toString();
@@ -52,16 +54,23 @@ public class Person {
         this.car = car;
     }
 
-    public Dog getDog() {
-        return dog;
+    public List<Dog> getDogs() {
+        return dogs;
     }
 
-    public void setDog(Dog dog) {
-        this.dog = dog;
-    }
+    // Setter isn't necessary anymore because Service must be the only one authorized to modify any lists.
+    // Also, we're no longer assigning dogs and people individually.
+    // Every person has its own list of dogs using the method "person.getDogs().add(dog);"
 
     @Override
     public String toString() {
-        return "Person{id='" + id + "', name='" + name + "', age=" + age + "}";
+
+        // Preparing dog text
+        String dogsText = "";
+        for (Dog dog : dogs) {
+            dogsText = dogsText + dog.getName() + " (" + dog.getId() + "), ";
+        }
+        // Returning all the information together
+        return "Person{id='" + id + "', name='" + name + "', age=" + age + ", dogs=" + dogsText + "}";
     }
 }
