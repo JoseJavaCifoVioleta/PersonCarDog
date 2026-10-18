@@ -1,9 +1,13 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Dog {
 
     private String id;

@@ -9,6 +9,7 @@ import org.example.model.Person;
 import org.example.repository.Repository;
 import org.example.service.Service;
 import org.example.utils.DataSeeder;
+import org.example.utils.JsonStore;
 import org.example.utils.ResultOperation;
 import org.example.utils.Utils;
 
@@ -60,11 +61,16 @@ public class Controller {
                     dogAdoptionSubMenu(scan, repo);
                     break;
                 case "9":
-                    System.out.println("Save repository to JSON file: not implemented yet (pending feature).");
+                    JsonStore.save(repo, JsonStore.DEFAULT_FILE);
                     break;
-                case "10":
-                    System.out.println("Load repository from JSON file: not implemented yet (pending feature).");
+                case "10": {
+                    Repository loaded = JsonStore.load(JsonStore.DEFAULT_FILE);
+                    if (loaded != null) {
+                        repo = loaded;
+                        System.out.println("Repository replaced with the loaded data.");
+                    }
                     break;
+                }
                 case "11":
                     System.out.println("Goodbye!");
                     return;

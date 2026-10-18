@@ -10,7 +10,9 @@ import org.example.service.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DataSeeder {
 
@@ -50,10 +52,17 @@ public class DataSeeder {
         temporaryPeople.get(0).setCar(temporaryCars.get(0));
         temporaryPeople.get(2).setCar(temporaryCars.get(1));
 
-        // 3. Generate 5 Dogs
+        // 3. Generate 5 Dogs (unique names, so the console demo is easy to follow)
+        Set<String> usedDogNames = new HashSet<>();
         for (int i = 0; i < 5; i++) {
+            String baseName = faker.dog().name();
+            String name = baseName;
+            int suffix = 2;
+            while (!usedDogNames.add(name)) {
+                name = baseName + " " + (suffix++);
+            }
             Dog dog = new Dog(
-                    faker.dog().name(),
+                    name,
                     faker.dog().breed(),
                     faker.number().numberBetween(1, 15)
             );

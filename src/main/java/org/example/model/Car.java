@@ -1,7 +1,11 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.UUID;
 
+@JsonIdentityInfo(property = "id", generator = ObjectIdGenerators.PropertyGenerator.class)
 public class Car {
 
     private String id;

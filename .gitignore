@@ -40,3 +40,6 @@ build/
 
 ### opencode sandbox ###
 opencode-sbx/
+
+### saved repository data ###
+repository.json
