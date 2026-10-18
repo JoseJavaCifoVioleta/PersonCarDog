@@ -424,11 +424,8 @@ public class Controller {
             return;
         }
 
-        System.out.println(result.getResult());
-
-        if (result.getReason() != null
-                && !result.getReason().isBlank()) {
-            System.out.println(result.getReason());
-        }
+        System.out.println(
+                (result.isSuccess() ? "SUCCESS" : "ERROR")
+                        + ": " + result.getMessage());
     }
 }
